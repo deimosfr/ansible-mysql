@@ -1,0 +1,146 @@
+#
+# The MySQL database server configuration file.
+#
+# You can copy this to one of:
+# - "/etc/mysql/my.cnf" to set global options,
+# - "~/.my.cnf" to set user-specific options.
+# 
+# One can use all long options that the program supports.
+# Run program with --help to get a list of available options and with
+# --print-defaults to see which it would actually understand and use.
+#
+# For explanations see
+# http://dev.mysql.com/doc/mysql/en/server-system-variables.html
+
+# This will be passed to all mysql clients
+# It has been reported that passwords should be enclosed with ticks/quotes
+# escpecially if they contain "#" chars...
+# Remember to edit /etc/mysql/debian.cnf when changing the socket location.
+[client]
+port		= {{mysql_client_port}}
+socket		= {{mysql_client_socket}}
+
+# Here is entries for some specific programs
+# The following values assume you have at least 32M ram
+
+# This was formally known as [safe_mysqld]. Both versions are currently parsed.
+[mysqld_safe]
+socket		= {{mysql_mysqld_safe_socket}}
+nice		= {{mysql_mysqld_safe_nice}}
+
+[mysqld]
+#
+# * Basic Settings
+#
+user		= {{mysql_mysqld_user}}
+pid-file	= {{mysql_mysqld_pid_file}}
+socket		= {{mysql_mysqld_socket}}
+port		= {{mysql_mysqld_port}}
+basedir		= {{mysql_mysqld_basedir}}
+datadir		= {{mysql_mysqld_datadir}}
+tmpdir		= {{mysql_mysqld_tmpdir}}
+# lc-message-dir is unknown to MySQL 5.1
+#lc-messages-dir	= /usr/share/mysql
+{% if mysql_mysqld_skip_external_locking %}
+skip-external-locking
+{% endif %}
+#
+# Instead of skip-networking the default is now to listen only on
+# localhost which is more compatible and is not less secure.
+bind-address		= {{mysql_mysqld_bind_address}}
+#
+# * Fine Tuning
+#
+key_buffer		    = {{mysql_mysqld_key_buffer}}
+max_allowed_packet	= {{mysql_mysqld_max_allowed_packet}}
+thread_stack		= {{mysql_mysqld_thread_stack}}
+thread_cache_size   = {{mysql_mysqld_thread_cache_size}}
+# This replaces the startup script and checks MyISAM tables if needed
+# the first time they are touched
+myisam-recover      = {{mysql_mysqld_myisam_recover}}
+max_connections     = {{mysql_mysqld_max_connections}}
+#
+# * Query Cache Configuration
+#
+query_cache_limit	= {{mysql_mysqld_query_cache_limit}}
+query_cache_size    = {{mysql_mysqld_query_cache_size}}
+#
+# * Logging and Replication
+#
+# Both location gets rotated by the cronjob.
+# Be aware that this log type is a performance killer.
+# As of 5.1 you can enable the log at runtime!
+general_log_file    = {{mysql_mysqld_general_log_file}}
+general_log         = {{mysql_mysqld_general_log}}
+#
+# Error logging goes to syslog due to /etc/mysql/conf.d/mysqld_safe_syslog.cnf.
+#
+# Here you can see queries with especially long duration
+slow_query_log      = {{mysql_mysqld_slow_query_log}}
+slow_query_log_file = {{mysql_mysqld_slow_query_log_file}}
+long_query_time     = {{mysql_mysqld_long_query_time}}
+{% if mysql_mysqld_log_queries_not_using_indexes %}
+log_queries_not_using_indexes
+{% endif %}
+#
+# The following can be used as easy to replay backup logs or^ for replication.
+# note: if you are setting up a replication slave, see README.Debian about
+#       other settings you may need to change.
+{% if mysql_enable_replication %}
+server-id		    = {{mysql_mysqld_server_id}}
+log_bin			    = {{mysql_mysqld_log_bin}}
+expire_logs_days	= {{mysql_mysqld_expire_logs_days}}
+max_binlog_size     = {{mysql_mysqld_max_binlog_size}}
+binlog_do_db		= {{mysql_mysqld_binlog_do_db}}
+binlog_ignore_db	= {{mysql_mysqld_binlog_ignore_db}}
+{% endif %}
+#
+# * InnoDB
+#
+# InnoDB is enabled by default with a 10MB datafile in /var/lib/mysql/.
+# Read the manual for more InnoDB related options. There are many!
+#
+# * Security Features
+#
+# Read the manual, too, if you want chroot!
+# chroot = /var/lib/mysql/
+#
+# For generating SSL certificates I recommend the OpenSSL GUI "tinyca".
+#
+# ssl-ca=/etc/mysql/cacert.pem
+# ssl-cert=/etc/mysql/server-cert.pem
+# ssl-key=/etc/mysql/server-key.pem
+
+default_storage_engine          = {{mysql_mysqld_default_storage_engine}}
+innodb_buffer_pool_size         = {{mysql_mysqld_innodb_buffer_pool_size}}
+innodb_log_file_size            = {{mysql_mysqld_innodb_log_file_size}}
+innodb_log_buffer_size          = {{mysql_mysqld_innodb_log_buffer_size}}
+innodb_thread_concurrency       = {{mysql_mysqld_innodb_thread_concurrency}}
+innodb_read_io_threads          = {{mysql_mysqld_innodb_read_io_threads}}
+innodb_write_io_threads         = {{mysql_mysqld_innodb_write_io_threads}}
+innodb_file_per_table           = {{mysql_mysqld_innodb_file_per_table}}
+innodb_open_files               = {{mysql_mysqld_innodb_open_files}}
+innodb_io_capacity              = {{mysql_mysqld_innodb_io_capacity}}
+innodb_lock_wait_timeout        = {{mysql_mysqld_innodb_lock_wait_timeout}}
+innodb_flush_method             = {{mysql_mysqld_innodb_flush_method}}
+innodb_doublewrite              = {{mysql_mysqld_innodb_doublewrite}}
+innodb_use_native_aio           = {{mysql_mysqld_innodb_use_native_aio}}
+
+[mysqldump]
+{% if mysql_enable_mysqldump %}
+quick
+quote-names
+{% endif %}
+max_allowed_packet = {{mysql_mysqldump_max_allowed_packet}}
+
+[mysql]
+#no-auto-rehash	# faster start of mysql but no tab completition
+
+[isamchk]
+key_buffer		= {{mysql_isamchk_key_buffer}}
+
+#
+# * IMPORTANT: Additional settings that can override those from this file!
+#   The files must end with '.cnf', otherwise they'll be ignored.
+#
+!includedir {{mysql_includedir}}

@@ -1,0 +1,14 @@
+---
+galaxy_info:
+  author: "Pierre Mavro"
+  company: 
+  license: GPL
+  min_ansible_version: 1.6
+  platforms:
+   - name: Debian
+     versions:
+      - all
+  categories:
+   - database
+dependencies: []
+
